@@ -1056,8 +1056,12 @@ const STATUS_MAP = {
 const MATERIALS = ['resume','portfolio','other'];
 const MAT_LABELS = {resume:'简历',portfolio:'作品集',other:'其他材料'};
 
-// Quick links data - 互联网大中厂校招官网
-let quicklinks = [
+// ============ localStorage Persistence ============
+const LS_APPS = 'jobTracker_apps';
+const LS_LINKS = 'jobTracker_quicklinks';
+
+// Default quick links
+const DEFAULT_QUICKLINKS = [
   { id: 'ql1', name: '腾讯', url: 'https://join.qq.com', color: '#3aa0ff' },
   { id: 'ql2', name: '字节跳动', url: 'https://jobs.bytedance.com/campus', color: '#ff6a00' },
   { id: 'ql3', name: '阿里巴巴', url: 'https://talent.alibaba.com/campus', color: '#ff6a00' },
@@ -1080,8 +1084,8 @@ let quicklinks = [
   { id: 'ql20', name: '大疆', url: 'https://we.dji.com/campus', color: '#1a1a2e' }
 ];
 
-// Sample data
-let apps = [
+// Default sample data
+const DEFAULT_APPS = [
   {
     id: 'd1', company: '腾讯', position: '前端开发工程师', type: '秋招',
     status: 'interview', deadline: '2026-04-20', interviewDate: '2026-04-22',
@@ -1126,6 +1130,13 @@ let apps = [
   }
 ];
 
+// Load data from localStorage or use defaults
+let apps = JSON.parse(localStorage.getItem(LS_APPS)) || DEFAULT_APPS;
+let quicklinks = JSON.parse(localStorage.getItem(LS_LINKS)) || DEFAULT_QUICKLINKS;
+
+function saveApps() { localStorage.setItem(LS_APPS, JSON.stringify(apps)); }
+function saveQuicklinks() { localStorage.setItem(LS_LINKS, JSON.stringify(quicklinks)); }
+
 function genId() { return 'a' + Date.now() + Math.random().toString(36).slice(2,6); }
 
 // ============ RENDER ============
@@ -1160,6 +1171,7 @@ function deleteQuicklink(id) {
   if (!link) return;
   if (!confirm(`确定删除「${link.name}」的快捷入口吗？`)) return;
   quicklinks = quicklinks.filter(l => l.id !== id);
+  saveQuicklinks();
   renderQuicklinks();
 }
 
@@ -1181,6 +1193,7 @@ function saveQuicklink() {
   const colors = ['#3aa0ff','#ff6a00','#ffc107','#e53935','#2196f3','#ff2442','#7c3aed','#1a9f3e','#1a1a2e','#1565c0','#fb7299','#0086f6'];
   const color = colors[Math.floor(Math.random() * colors.length)];
   quicklinks.push({ id: 'ql' + Date.now(), name, url: finalUrl, color });
+  saveQuicklinks();
   closeModal('addLinkModal');
   renderQuicklinks();
 }
@@ -1477,6 +1490,7 @@ function saveApplication() {
   }
 
   closeModal('formModal');
+  saveApps();
   renderBoard();
 }
 
@@ -1486,6 +1500,7 @@ function deleteApplication(id) {
   if (!confirm(`确定删除「${app.company} - ${app.position}」的申请吗？`)) return;
   apps = apps.filter(a => a.id !== id);
   closeModal('detailModal');
+  saveApps();
   renderBoard();
 }
 
