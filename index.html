@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>求职申请管理看板</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card-bg: #ffffff;
+    --primary: #0071e3;
+    --primary-light: #e8f0fe;
+    --primary-dark: #0055b3;
+    --danger: #ff3b30;
+    --danger-light: #ffe5e3;
+    --warning: #ff9f0a;
+    --warning-light: #fff5e0;
+    --success: #30d158;
+    --success-light: #e8fbe8;
+    --info: #5ac8fa;
+    --info-light: #e6f7ff;
+    --purple: #af52de;
+    --purple-light: #f3e8fd;
+    --text: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-tertiary: #aeaeb2;
+    --border: rgba(0,0,0,0.06);
+    --border-strong: rgba(0,0,0,0.1);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 2px 8px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-xs: 8px;
+    --transition: 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Noto Sans SC", "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Header — frosted glass */
+  .header {
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    color: white;
+    padding: 18px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+  .header .subtitle { font-size: 12px; opacity: 0.55; margin-top: 2px; font-weight: 400; letter-spacing: 0.01em; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: flex;
+    gap: 14px;
+    padding: 20px 36px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto;
+  }
+  .stat-card {
+    flex: 1;
+    min-width: 140px;
+    padding: 18px 20px;
+    border-radius: var(--radius-sm);
+    background: rgba(0,113,227,0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: var(--transition);
+    border: 0.5px solid rgba(0,113,227,0.1);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .stat-card:hover { transform: scale(1.02); }
+  .stat-card .stat-info { flex: 1; }
+  .stat-card .stat-num { font-size: 32px; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; line-height: 1; }
+  .stat-card .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card .stat-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: rgba(0,113,227,0.1);
+  }
+  .stat-card .stat-icon svg { width: 20px; height: 20px; stroke: var(--primary); stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .stat-card.status-pending {
+    background: rgba(255,159,10,0.1);
+    backdrop-filter: blur(16px);
+    border-color: rgba(255,159,10,0.12);
+  }
+  .stat-card.status-pending .stat-num { color: var(--warning); }
+  .stat-card.status-pending .stat-icon { background: rgba(255,159,10,0.12); }
+  .stat-card.status-pending .stat-icon svg { stroke: var(--warning); }
+  .stat-card.status-progress {
+    background: rgba(0,119,199,0.08);
+    backdrop-filter: blur(16px);
+    border-color: rgba(0,119,199,0.1);
+  }
+  .stat-card.status-progress .stat-num { color: #0077c7; }
+  .stat-card.status-progress .stat-icon { background: rgba(0,119,199,0.1); }
+  .stat-card.status-progress .stat-icon svg { stroke: #0077c7; }
+  .stat-card.status-interview {
+    background: rgba(175,82,222,0.08);
+    backdrop-filter: blur(16px);
+    border-color: rgba(175,82,222,0.1);
+  }
+  .stat-card.status-interview .stat-num { color: var(--purple); }
+  .stat-card.status-interview .stat-icon { background: rgba(175,82,222,0.1); }
+  .stat-card.status-interview .stat-icon svg { stroke: var(--purple); }
+  .stat-card.status-offer {
+    background: rgba(48,209,88,0.1);
+    backdrop-filter: blur(16px);
+    border-color: rgba(48,209,88,0.12);
+  }
+  .stat-card.status-offer .stat-num { color: #1a8f3a; }
+  .stat-card.status-offer .stat-icon { background: rgba(48,209,88,0.12); }
+  .stat-card.status-offer .stat-icon svg { stroke: #1a8f3a; }
+  .stat-card.status-rejected {
+    background: rgba(255,59,48,0.08);
+    backdrop-filter: blur(16px);
+    border-color: rgba(255,59,48,0.1);
+  }
+  .stat-card.status-rejected .stat-num { color: var(--danger); }
+  .stat-card.status-rejected .stat-icon { background: rgba(255,59,48,0.1); }
+  .stat-card.status-rejected .stat-icon svg { stroke: var(--danger); }
+
+  /* Filter Bar */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    padding: 12px 36px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid var(--border);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .filter-bar label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+  .filter-bar select, .filter-bar input[type="text"] {
+    padding: 8px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    font-size: 13px;
+    background: rgba(255,255,255,0.8);
+    color: var(--text);
+    outline: none;
+    transition: var(--transition);
+    font-family: inherit;
+  }
+  .filter-bar select:focus, .filter-bar input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+  }
+  .search-input {
+    flex: 1;
+    min-width: 180px;
+    max-width: 320px;
+  }
+
+  /* Kanban Board */
+  .kanban {
+    display: flex;
+    gap: 14px;
+    padding: 24px 28px;
+    overflow-x: auto;
+    min-height: calc(100vh - 240px);
+    justify-content: center;
+  }
+  .kanban-column {
+    flex: 1;
+    min-width: 260px;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border-strong);
+    overflow: hidden;
+  }
+  .column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .column-header .count {
+    background: rgba(0,0,0,0.05);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .col-pending .column-header { color: #b37400; }
+  .col-pending .column-header .count { background: rgba(255,159,10,0.12); color: #b37400; }
+  .col-progress .column-header { color: #0077c7; }
+  .col-progress .column-header .count { background: rgba(0,119,199,0.1); color: #0077c7; }
+  .col-interview .column-header { color: var(--purple); }
+  .col-interview .column-header .count { background: rgba(175,82,222,0.1); color: var(--purple); }
+  .col-offer .column-header { color: #1a8f3a; }
+  .col-offer .column-header .count { background: rgba(48,209,88,0.12); color: #1a8f3a; }
+  .col-rejected .column-header { color: var(--danger); }
+  .col-rejected .column-header .count { background: rgba(255,59,48,0.1); color: var(--danger); }
+
+  .column-body {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+  }
+
+  /* Application Card */
+  .app-card {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    box-shadow: var(--shadow), inset 0 0 0 0.5px rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .app-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: rgba(0,113,227,0.2);
+  }
+  .app-card .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .app-card .company { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .app-card .position { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; font-weight: 400; }
+  .app-card .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .tag-deadline { background: var(--warning-light); color: #9a6700; }
+  .tag-deadline.urgent { background: var(--danger-light); color: #c42218; }
+  .tag-type { background: var(--primary-light); color: var(--primary-dark); }
+  .tag-material { background: var(--success-light); color: #1a6b30; }
+  .tag-material.incomplete { background: var(--danger-light); color: #c42218; }
+  .app-card .card-bottom { display: flex; justify-content: space-between; align-items: center; }
+  .app-card .update-time { font-size: 11px; color: var(--text-tertiary); font-weight: 400; }
+  .app-card .card-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+  .app-card:hover .card-actions { opacity: 1; }
+  .card-actions button {
+    width: 28px; height: 28px;
+    border: none; border-radius: var(--radius-xs);
+    background: var(--primary-light);
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .card-actions button:hover { background: var(--primary); color: white; }
+  .card-actions button.btn-del:hover { background: var(--danger); color: white; }
+
+  /* Empty Column */
+  .empty-hint {
+    text-align: center;
+    padding: 28px 14px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    font-weight: 400;
+    border: 1.5px dashed rgba(0,0,0,0.08);
+    border-radius: var(--radius-sm);
+    margin: 4px;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--radius-xs);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+  }
+  .btn-primary { background: white; color: var(--primary); }
+  .btn-primary:hover { background: var(--primary-light); }
+  .btn-add {
+    background: rgba(255,255,255,0.14);
+    color: white;
+    border: 0.5px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .btn-add:hover { background: rgba(255,255,255,0.25); }
+
+  /* View Toggle — pill style */
+  .view-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.1);
+    border-radius: 9px;
+    overflow: hidden;
+    border: 0.5px solid rgba(255,255,255,0.15);
+  }
+  .view-toggle button {
+    padding: 6px 14px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .view-toggle button.active {
+    background: rgba(255,255,255,0.18);
+    color: white;
+    font-weight: 600;
+  }
+  .view-toggle button:hover:not(.active) {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Table Mode */
+  .table-view {
+    padding: 24px 28px;
+    min-height: calc(100vh - 240px);
+  }
+  .app-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 0.5px solid var(--border);
+  }
+  .app-table thead th {
+    background: #fafafa;
+    padding: 14px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: left;
+    border-bottom: 0.5px solid var(--border-strong);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .app-table tbody tr {
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .app-table tbody tr:hover { background: rgba(0,113,227,0.04); }
+  .app-table tbody td {
+    padding: 14px 18px;
+    font-size: 13px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: middle;
+    font-weight: 400;
+  }
+  .app-table .td-company { font-weight: 600; letter-spacing: -0.01em; }
+  .app-table .td-position { color: var(--text-secondary); }
+  .app-table .td-shaded { background: rgba(0,0,0,0.05); }
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .status-badge.pending { background: var(--warning-light); color: #9a6700; }
+  .status-badge.progress { background: var(--info-light); color: #0077c7; }
+  .status-badge.interview { background: var(--purple-light); color: var(--purple); }
+  .status-badge.offer { background: var(--success-light); color: #1a8f3a; }
+  .status-badge.rejected { background: var(--danger-light); color: var(--danger); }
+  .priority-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .priority-badge.high { background: var(--danger-light); color: var(--danger); }
+  .priority-badge.medium { background: var(--warning-light); color: #9a6700; }
+  .priority-badge.low { background: var(--primary-light); color: var(--primary); }
+  .table-actions { display: flex; gap: 4px; }
+  .table-actions button {
+    width: 30px; height: 30px;
+    border: none; border-radius: var(--radius-xs);
+    background: rgba(0,0,0,0.03);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .table-actions button:hover { background: var(--primary-light); color: var(--primary); }
+  .table-actions button.btn-del:hover { background: var(--danger-light); color: var(--danger); }
+
+  /* Table group separator */
+  .app-table .group-separator td {
+    padding: 8px 18px;
+    background: rgba(0,0,0,0.02);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .group-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1);
+    animation: modalIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-header {
+    padding: 24px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h2 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .modal-close {
+    width: 30px; height: 30px;
+    border: none; border-radius: 50%;
+    background: rgba(0,0,0,0.05);
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .modal-close:hover { background: rgba(0,0,0,0.08); }
+  .modal-body { padding: 24px 28px; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 7px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: var(--transition);
+    font-family: inherit;
+    background: rgba(255,255,255,0.8);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+  }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-row { display: flex; gap: 14px; }
+  .form-row .form-group { flex: 1; }
+  .modal-footer { padding: 0 28px 24px; display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-save {
+    background: var(--primary); color: white; padding: 10px 28px;
+    font-weight: 500; border-radius: var(--radius-xs);
+  }
+  .btn-save:hover { background: var(--primary-dark); }
+  .btn-cancel {
+    background: rgba(0,0,0,0.04); color: var(--text-secondary); padding: 10px 20px;
+    font-weight: 500; border-radius: var(--radius-xs);
+  }
+  .btn-cancel:hover { background: rgba(0,0,0,0.07); }
+
+  /* Timeline in detail modal */
+  .timeline { padding: 0; list-style: none; }
+  .timeline li {
+    padding: 10px 0;
+    border-left: 2px solid var(--border);
+    padding-left: 18px;
+    position: relative;
+    font-size: 13px;
+  }
+  .timeline li::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    position: absolute;
+    left: -5px;
+    top: 14px;
+  }
+  .timeline .tl-date { color: var(--text-tertiary); font-size: 11px; font-weight: 500; }
+  .timeline .tl-text { color: var(--text); margin-top: 2px; font-weight: 400; }
+
+  /* Deadline warning pulse */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  .urgent-pulse { animation: pulse 1.5s infinite; }
+
+  /* Quick Links Section */
+  .quicklinks-section {
+    display: flex;
+    gap: 10px;
+    padding: 14px 36px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid var(--border);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .quicklinks-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .quicklinks-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+  }
+  .qlink {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    background: rgba(0,0,0,0.03);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-xs);
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 400;
+    transition: var(--transition);
+    position: relative;
+    cursor: pointer;
+  }
+  .qlink:hover {
+    background: var(--primary-light);
+    border-color: rgba(0,113,227,0.15);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+  .qlink .qlink-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .qlink .qlink-del {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-tertiary);
+    font-size: 11px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin-left: 2px;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+  .qlink:hover .qlink-del { display: inline-flex; }
+  .qlink .qlink-del:hover { background: var(--danger-light); color: var(--danger); }
+  .btn-add-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    background: transparent;
+    border: 1.5px dashed rgba(0,0,0,0.1);
+    border-radius: var(--radius-xs);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+  }
+  .btn-add-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header { padding: 14px 18px; }
+    .header h1 { font-size: 18px; }
+    .stats-bar, .filter-bar, .quicklinks-section { padding: 12px 18px; }
+    .kanban { padding: 14px; gap: 12px; }
+    .kanban-column { min-width: 240px; }
+    .table-view { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <h1>求职申请管理</h1>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="view-toggle">
+      <button id="btnKanban" class="active" onclick="switchView('kanban')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> 看板</button>
+      <button id="btnTable" onclick="switchView('table')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><line x1="8" y1="3" x2="8" y2="21"/></svg> 表格</button>
+    </div>
+    <button class="btn btn-add" onclick="openAddModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新增申请</button>
+  </div>
+</div>
+
+<!-- Quick Links: 校招官网快捷入口 -->
+<div class="quicklinks-section">
+  <span class="quicklinks-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>校招官网：</span>
+  <div class="quicklinks-body" id="quicklinksBody"></div>
+</div>
+
+<!-- Stats -->
+<div class="stats-bar" id="statsBar"></div>
+
+<!-- Filters -->
+<div class="filter-bar">
+  <label>筛选：</label>
+  <input type="text" class="search-input" id="searchInput" placeholder="搜索公司名或职位..." oninput="renderBoard()">
+  <select id="filterType" onchange="renderBoard()">
+    <option value="">全部类型</option>
+    <option value="秋招">秋招</option>
+    <option value="春招">春招</option>
+    <option value="实习">实习</option>
+  </select>
+  <select id="filterSort" onchange="renderBoard()">
+    <option value="deadline">按截止日期排序</option>
+    <option value="update">按更新时间排序</option>
+    <option value="company">按公司名排序</option>
+    <option value="status">按阶段排序</option>
+  </select>
+</div>
+
+<!-- Kanban Board -->
+<div class="kanban" id="kanbanBoard"></div>
+
+<!-- Table View -->
+<div class="table-view" id="tableView" style="display:none;"></div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">新增申请</h2>
+      <button class="modal-close" onclick="closeModal('formModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="form-row">
+        <div class="form-group">
+          <label>公司名称 *</label>
+          <input type="text" id="fCompany" placeholder="如：腾讯">
+        </div>
+        <div class="form-group">
+          <label>申请职位 *</label>
+          <input type="text" id="fPosition" placeholder="如：前端开发工程师">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>申请类型</label>
+          <select id="fType">
+            <option value="秋招">秋招</option>
+            <option value="春招">春招</option>
+            <option value="实习">实习</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>当前状态</label>
+          <select id="fStatus">
+            <option value="pending">待投递</option>
+            <option value="progress">已投递</option>
+            <option value="interview">面试中</option>
+            <option value="offer">已Offer</option>
+            <option value="rejected">已拒绝</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>申请截止日期</label>
+          <input type="date" id="fDeadline">
+        </div>
+        <div class="form-group">
+          <label>面试日期</label>
+          <input type="date" id="fInterview">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>材料准备情况</label>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:4px;">
+          <label style="font-weight:400;font-size:13px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="fMatResume"> 简历
+          </label>
+          <label style="font-weight:400;font-size:13px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="fMatPortfolio"> 作品集
+          </label>
+          <label style="font-weight:400;font-size:13px;display:flex;align-items:center;gap:4px;">
+            <input type="checkbox" id="fMatOther"> 其他材料
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="fNotes" placeholder="记录关键信息，如内推人、笔试链接等..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeModal('formModal')">取消</button>
+      <button class="btn btn-save" onclick="saveApplication()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="detailTitle">申请详情</h2>
+      <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeModal('detailModal')">关闭</button>
+      <button class="btn btn-save" id="detailEditBtn" style="background:var(--purple);">编辑</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Link Modal -->
+<div class="modal-overlay" id="addLinkModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h2>添加校招官网</h2>
+      <button class="modal-close" onclick="closeModal('addLinkModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>公司名称 *</label>
+        <input type="text" id="linkName" placeholder="如：vivo">
+      </div>
+      <div class="form-group">
+        <label>校招网址 *</label>
+        <input type="text" id="linkUrl" placeholder="如：https://hr.vivo.com/campus">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeModal('addLinkModal')">取消</button>
+      <button class="btn btn-save" onclick="saveQuicklink()">添加</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+const STATUS_MAP = {
+  pending:   { label: '待投递', col: 'col-pending' },
+  progress:  { label: '已投递', col: 'col-progress' },
+  interview: { label: '面试中', col: 'col-interview' },
+  offer:     { label: '已Offer', col: 'col-offer' },
+  rejected:  { label: '已拒绝', col: 'col-rejected' }
+};
+
+const MATERIALS = ['resume','portfolio','other'];
+const MAT_LABELS = {resume:'简历',portfolio:'作品集',other:'其他材料'};
+
+// Quick links data - 互联网大中厂校招官网
+let quicklinks = [
+  { id: 'ql1', name: '腾讯', url: 'https://join.qq.com', color: '#3aa0ff' },
+  { id: 'ql2', name: '字节跳动', url: 'https://jobs.bytedance.com/campus', color: '#ff6a00' },
+  { id: 'ql3', name: '阿里巴巴', url: 'https://talent.alibaba.com/campus', color: '#ff6a00' },
+  { id: 'ql4', name: '美团', url: 'https://campus.meituan.com', color: '#ffc107' },
+  { id: 'ql5', name: '华为', url: 'https://career.huawei.com/campus', color: '#e53935' },
+  { id: 'ql6', name: '小红书', url: 'https://job.xiaohongshu.com/campus', color: '#ff2442' },
+  { id: 'ql7', name: '京东', url: 'https://zhaopin.jd.com/campus', color: '#e4393c' },
+  { id: 'ql8', name: '网易', url: 'https://campus.163.com', color: '#c0392b' },
+  { id: 'ql9', name: '百度', url: 'https://talent.baidu.com/campus', color: '#2196f3' },
+  { id: 'ql10', name: '拼多多', url: 'https://careers.pinduoduo.com/campus', color: '#e53935' },
+  { id: 'ql11', name: '快手', url: 'https://campus.kuaishou.cn', color: '#ff6a00' },
+  { id: 'ql12', name: '滴滴', url: 'https://talent.didiglobal.com/campus', color: '#ff8c00' },
+  { id: 'ql13', name: '蚂蚁集团', url: 'https://talent.antgroup.com/campus', color: '#2196f3' },
+  { id: 'ql14', name: 'B站', url: 'https://jobs.bilibili.com/campus', color: '#fb7299' },
+  { id: 'ql15', name: '携程', url: 'https://campus.ctrip.com', color: '#0086f6' },
+  { id: 'ql16', name: '米哈游', url: 'https://career.mihoyo.com/campus', color: '#7c3aed' },
+  { id: 'ql17', name: 'OPPO', url: 'https://careers.oppo.com/campus', color: '#1a9f3e' },
+  { id: 'ql18', name: '联想', url: 'https://career.lenovo.com/campus', color: '#e53935' },
+  { id: 'ql19', name: '商汤科技', url: 'https://hr.sensetime.com/campus', color: '#1565c0' },
+  { id: 'ql20', name: '大疆', url: 'https://we.dji.com/campus', color: '#1a1a2e' }
+];
+
+// Sample data
+let apps = [
+  {
+    id: 'd1', company: '腾讯', position: '前端开发工程师', type: '秋招',
+    status: 'interview', deadline: '2026-04-20', interviewDate: '2026-04-22',
+    materials: {resume:true,portfolio:false,other:false},
+    priority: 'high', channel: '内推',
+    notes: '微信事业群，内推人：张学长', createdAt: '2026-04-10', updatedAt: '2026-04-15'
+  },
+  {
+    id: 'd2', company: '字节跳动', position: '后端开发', type: '秋招',
+    status: 'progress', deadline: '2026-04-25', interviewDate: '',
+    materials: {resume:true,portfolio:false,other:false},
+    priority: 'high', channel: '官网',
+    notes: '抖音电商部门', createdAt: '2026-04-12', updatedAt: '2026-04-14'
+  },
+  {
+    id: 'd3', company: '阿里巴巴', position: '数据工程师', type: '秋招',
+    status: 'pending', deadline: '2026-04-18', interviewDate: '',
+    materials: {resume:true,portfolio:false,other:true},
+    priority: 'medium', channel: '官网',
+    notes: '需准备SQL笔试', createdAt: '2026-04-08', updatedAt: '2026-04-08'
+  },
+  {
+    id: 'd4', company: '美团', position: '算法工程师', type: '实习',
+    status: 'offer', deadline: '', interviewDate: '2026-04-10',
+    materials: {resume:true,portfolio:true,other:true},
+    priority: 'low', channel: '牛客',
+    notes: 'Offer已到手！薪资待谈', createdAt: '2026-03-20', updatedAt: '2026-04-12'
+  },
+  {
+    id: 'd5', company: '华为', position: '嵌入式开发', type: '秋招',
+    status: 'rejected', deadline: '2026-03-30', interviewDate: '2026-03-28',
+    materials: {resume:true,portfolio:false,other:false},
+    priority: 'medium', channel: '校招会',
+    notes: '二面未通过，记录面经', createdAt: '2026-03-15', updatedAt: '2026-04-02'
+  },
+  {
+    id: 'd6', company: '小红书', position: '产品经理', type: '春招',
+    status: 'progress', deadline: '2026-04-28', interviewDate: '',
+    materials: {resume:true,portfolio:false,other:false},
+    priority: 'low', channel: '内推',
+    notes: '社区方向', createdAt: '2026-04-16', updatedAt: '2026-04-16'
+  }
+];
+
+function genId() { return 'a' + Date.now() + Math.random().toString(36).slice(2,6); }
+
+// ============ RENDER ============
+
+// Quicklinks render
+function renderQuicklinks() {
+  const body = document.getElementById('quicklinksBody');
+  body.innerHTML = '';
+  quicklinks.forEach(link => {
+    const el = document.createElement('a');
+    el.className = 'qlink';
+    el.href = link.url;
+    el.target = '_blank';
+    el.rel = 'noopener noreferrer';
+    el.innerHTML = `
+      <span class="qlink-icon">${link.name.charAt(0)}</span>
+      <span>${link.name}</span>
+      <button class="qlink-del" title="删除" onclick="event.preventDefault();event.stopPropagation();deleteQuicklink('${link.id}')">✕</button>
+    `;
+    body.appendChild(el);
+  });
+  // Add button
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn-add-link';
+  addBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 添加公司';
+  addBtn.onclick = openAddLinkModal;
+  body.appendChild(addBtn);
+}
+
+function deleteQuicklink(id) {
+  const link = quicklinks.find(l => l.id === id);
+  if (!link) return;
+  if (!confirm(`确定删除「${link.name}」的快捷入口吗？`)) return;
+  quicklinks = quicklinks.filter(l => l.id !== id);
+  renderQuicklinks();
+}
+
+function openAddLinkModal() {
+  document.getElementById('linkName').value = '';
+  document.getElementById('linkUrl').value = '';
+  document.getElementById('addLinkModal').classList.add('active');
+  setTimeout(() => document.getElementById('linkName').focus(), 100);
+}
+
+function saveQuicklink() {
+  const name = document.getElementById('linkName').value.trim();
+  const url = document.getElementById('linkUrl').value.trim();
+  if (!name || !url) { alert('请填写公司名称和网址！'); return; }
+  // Auto-prefix https if missing
+  let finalUrl = url;
+  if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+  // Random color from palette
+  const colors = ['#3aa0ff','#ff6a00','#ffc107','#e53935','#2196f3','#ff2442','#7c3aed','#1a9f3e','#1a1a2e','#1565c0','#fb7299','#0086f6'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  quicklinks.push({ id: 'ql' + Date.now(), name, url: finalUrl, color });
+  closeModal('addLinkModal');
+  renderQuicklinks();
+}
+
+// ============ VIEW SWITCHING ============
+let currentView = 'kanban';
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('btnKanban').classList.toggle('active', view === 'kanban');
+  document.getElementById('btnTable').classList.toggle('active', view === 'table');
+  document.getElementById('kanbanBoard').style.display = view === 'kanban' ? '' : 'none';
+  document.getElementById('tableView').style.display = view === 'table' ? '' : 'none';
+  renderBoard();
+}
+
+function getFilteredApps() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filterType = document.getElementById('filterType').value;
+  const sortBy = document.getElementById('filterSort').value;
+
+  let filtered = apps.filter(a => {
+    if (search && !a.company.toLowerCase().includes(search) && !a.position.toLowerCase().includes(search)) return false;
+    if (filterType && a.type !== filterType) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    if (sortBy === 'deadline') {
+      if (!a.deadline) return 1;
+      if (!b.deadline) return -1;
+      return a.deadline.localeCompare(b.deadline);
+    }
+    if (sortBy === 'update') return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+    if (sortBy === 'company') return a.company.localeCompare(b.company, 'zh');
+    if (sortBy === 'status') {
+      const statusOrder = ['pending','progress','interview','offer','rejected'];
+      return statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+    }
+    return 0;
+  });
+  return filtered;
+}
+
+function renderTable() {
+  const filtered = getFilteredApps();
+  const sortBy = document.getElementById('filterSort').value;
+  const container = document.getElementById('tableView');
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-hint" style="margin:40px auto;max-width:400px;">暂无申请记录</div>';
+    return;
+  }
+  let html = `<table class="app-table">
+    <thead><tr>
+      <th>公司 / 岗位</th>
+      <th>阶段</th>
+      <th>备注</th>
+      <th>截止日期</th>
+      <th>优先级</th>
+      <th>申请渠道</th>
+      <th style="width:80px;">操作</th>
+    </tr></thead><tbody>`;
+
+  let lastStatus = '';
+
+  filtered.forEach(app => {
+    const info = STATUS_MAP[app.status];
+    // Group separator when sorting by status
+    if (sortBy === 'status' && app.status !== lastStatus) {
+      lastStatus = app.status;
+      const statusColors = {
+        pending: {bg:'var(--warning-light)',color:'#9a6700'},
+        progress: {bg:'var(--info-light)',color:'#0077c7'},
+        interview: {bg:'var(--purple-light)',color:'var(--purple)'},
+        offer: {bg:'var(--success-light)',color:'#1a8f3a'},
+        rejected: {bg:'var(--danger-light)',color:'var(--danger)'}
+      };
+      const sc = statusColors[app.status] || {bg:'var(--primary-light)',color:'var(--primary)'};
+      html += `<tr class="group-separator"><td colspan="7"><span class="group-label" style="background:${sc.bg};color:${sc.color};">${info.label}</span></td></tr>`;
+    }
+    // Deadline display
+    let deadlineCell = '-';
+    if (app.deadline) {
+      const daysLeft = Math.ceil((new Date(app.deadline) - new Date()) / 86400000);
+      if (daysLeft < 0) deadlineCell = `<span style="color:var(--danger);font-weight:600;">${app.deadline} (已截止)</span>`;
+      else if (daysLeft <= 3) deadlineCell = `<span class="urgent-pulse" style="color:var(--danger);font-weight:600;">${app.deadline} (${daysLeft}天)</span>`;
+      else deadlineCell = app.deadline;
+    }
+    // Priority
+    const priLabels = {high:'高',medium:'中',low:'低'};
+    const pri = app.priority || 'medium';
+    // Channel
+    const channel = app.channel || '-';
+
+    html += `<tr onclick="showDetail('${app.id}')">
+      <td class="td-shaded"><span class="td-company">${app.company}</span><br><span class="td-position">${app.position}</span></td>
+      <td><span class="status-badge ${app.status}">${info.label}</span></td>
+      <td class="td-shaded" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${app.notes||''}">${app.notes || '-'}</td>
+      <td>${deadlineCell}</td>
+      <td><span class="priority-badge ${pri}">${priLabels[pri]}</span></td>
+      <td class="td-shaded">${channel}</td>
+      <td><div class="table-actions">
+        <button title="编辑" onclick="event.stopPropagation();editApplication('${app.id}')">✏</button>
+        <button title="删除" class="btn-del" onclick="event.stopPropagation();deleteApplication('${app.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderBoard() {
+  const filtered = getFilteredApps();
+
+  // Stats
+  const stats = { total: apps.length, pending:0, progress:0, interview:0, offer:0, rejected:0 };
+  apps.forEach(a => stats[a.status]++);
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-info"><div class="stat-num">${stats.total}</div><div class="stat-label">总申请数</div></div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+    </div>
+    <div class="stat-card status-pending">
+      <div class="stat-info"><div class="stat-num">${stats.pending}</div><div class="stat-label">待投递</div></div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    </div>
+    <div class="stat-card status-progress">
+      <div class="stat-info"><div class="stat-num">${stats.progress}</div><div class="stat-label">已投递</div></div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+    </div>
+    <div class="stat-card status-interview">
+      <div class="stat-info"><div class="stat-num">${stats.interview}</div><div class="stat-label">面试中</div></div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    </div>
+    <div class="stat-card status-offer">
+      <div class="stat-info"><div class="stat-num">${stats.offer}</div><div class="stat-label">已Offer</div></div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+    <div class="stat-card status-rejected">
+      <div class="stat-info"><div class="stat-num">${stats.rejected}</div><div class="stat-label">已拒绝</div></div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+  `;
+
+  // Render current view
+  if (currentView === 'table') {
+    renderTable();
+    return;
+  }
+
+  // Kanban view
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = '';
+
+  const columns = ['pending','progress','interview','offer','rejected'];
+  columns.forEach(status => {
+    const colApps = filtered.filter(a => a.status === status);
+    const info = STATUS_MAP[status];
+    const col = document.createElement('div');
+    col.className = `kanban-column ${info.col}`;
+    col.innerHTML = `
+      <div class="column-header">
+        <span>${info.label}</span>
+        <span class="count">${colApps.length}</span>
+      </div>
+      <div class="column-body" data-status="${status}">
+        ${colApps.length === 0 ? '<div class="empty-hint">暂无申请</div>' : ''}
+      </div>
+    `;
+    const body = col.querySelector('.column-body');
+    colApps.forEach(a => body.appendChild(createCard(a)));
+    board.appendChild(col);
+  });
+}
+
+function createCard(app) {
+  const card = document.createElement('div');
+  card.className = 'app-card';
+  card.onclick = (e) => { if (!e.target.closest('.card-actions')) showDetail(app.id); };
+
+  // Deadline tag
+  let deadlineHTML = '';
+  if (app.deadline) {
+    const daysLeft = Math.ceil((new Date(app.deadline) - new Date()) / 86400000);
+    const isUrgent = daysLeft <= 3 && daysLeft >= 0;
+    const isPast = daysLeft < 0;
+    if (isPast) {
+      deadlineHTML = `<span class="tag tag-deadline urgent">已截止</span>`;
+    } else if (isUrgent) {
+      deadlineHTML = `<span class="tag tag-deadline urgent urgent-pulse"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${daysLeft}天后截止</span>`;
+    } else {
+      deadlineHTML = `<span class="tag tag-deadline"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${app.deadline.slice(5)}截止</span>`;
+    }
+  }
+
+  // Interview tag
+  let interviewHTML = '';
+  if (app.interviewDate) {
+    const daysLeft = Math.ceil((new Date(app.interviewDate) - new Date()) / 86400000);
+    if (daysLeft === 0) interviewHTML = `<span class="tag tag-type"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>今天面试！</span>`;
+    else if (daysLeft > 0 && daysLeft <= 3) interviewHTML = `<span class="tag tag-type"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>${daysLeft}天后面试</span>`;
+  }
+
+  // Materials tag
+  const totalMats = MATERIALS.length;
+  const doneMats = MATERIALS.filter(m => app.materials[m]).length;
+  const matClass = doneMats < totalMats && doneMats < 2 ? 'incomplete' : '';
+  const matHTML = `<span class="tag tag-material ${matClass}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>材料 ${doneMats}/${totalMats}</span>`;
+
+  card.innerHTML = `
+    <div class="card-top">
+      <span class="company">${app.company}</span>
+    </div>
+    <div class="position">${app.position}</div>
+    <div class="card-tags">
+      <span class="tag tag-type">${app.type}</span>
+      ${deadlineHTML}
+      ${interviewHTML}
+      ${matHTML}
+    </div>
+    <div class="card-bottom">
+      <span class="update-time">更新于 ${app.updatedAt || app.createdAt}</span>
+      <div class="card-actions">
+        <button title="编辑" onclick="event.stopPropagation();editApplication('${app.id}')">✏</button>
+        <button title="删除" class="btn-del" onclick="event.stopPropagation();deleteApplication('${app.id}')">✕</button>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+// ============ MODAL OPS ============
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = '新增申请';
+  document.getElementById('editId').value = '';
+  ['fCompany','fPosition','fDeadline','fInterview','fNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fType').value = '秋招';
+  document.getElementById('fStatus').value = 'pending';
+  MATERIALS.forEach(m => document.getElementById('fMat' + m.charAt(0).toUpperCase() + m.slice(1)).checked = false);
+  document.getElementById('formModal').classList.add('active');
+}
+
+function editApplication(id) {
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  document.getElementById('modalTitle').textContent = '编辑申请';
+  document.getElementById('editId').value = id;
+  document.getElementById('fCompany').value = app.company;
+  document.getElementById('fPosition').value = app.position;
+  document.getElementById('fType').value = app.type;
+  document.getElementById('fStatus').value = app.status;
+  document.getElementById('fDeadline').value = app.deadline || '';
+  document.getElementById('fInterview').value = app.interviewDate || '';
+  document.getElementById('fNotes').value = app.notes || '';
+  MATERIALS.forEach(m => {
+    const el = document.getElementById('fMat' + m.charAt(0).toUpperCase() + m.slice(1));
+    el.checked = !!app.materials[m];
+  });
+  closeModal('detailModal');
+  document.getElementById('formModal').classList.add('active');
+}
+
+function saveApplication() {
+  const company = document.getElementById('fCompany').value.trim();
+  const position = document.getElementById('fPosition').value.trim();
+  if (!company || !position) { alert('请填写公司名称和职位！'); return; }
+
+  const id = document.getElementById('editId').value;
+  const today = new Date().toISOString().slice(0,10);
+  const materials = {};
+  MATERIALS.forEach(m => {
+    const el = document.getElementById('fMat' + m.charAt(0).toUpperCase() + m.slice(1));
+    materials[m] = el.checked;
+  });
+
+  const data = {
+    company,
+    position,
+    type: document.getElementById('fType').value,
+    status: document.getElementById('fStatus').value,
+    deadline: document.getElementById('fDeadline').value,
+    interviewDate: document.getElementById('fInterview').value,
+    materials,
+    notes: document.getElementById('fNotes').value.trim(),
+    updatedAt: today
+  };
+
+  if (id) {
+    const idx = apps.findIndex(a => a.id === id);
+    if (idx !== -1) apps[idx] = { ...apps[idx], ...data };
+  } else {
+    apps.push({ id: genId(), ...data, createdAt: today });
+  }
+
+  closeModal('formModal');
+  renderBoard();
+}
+
+function deleteApplication(id) {
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  if (!confirm(`确定删除「${app.company} - ${app.position}」的申请吗？`)) return;
+  apps = apps.filter(a => a.id !== id);
+  closeModal('detailModal');
+  renderBoard();
+}
+
+function showDetail(id) {
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  const info = STATUS_MAP[app.status];
+  document.getElementById('detailTitle').textContent = `${app.company} — ${app.position}`;
+
+  const matList = MATERIALS.map(m => {
+    const done = app.materials[m];
+    return `<span style="color:${done?'#1a8f3a':'var(--danger)'}; margin-right:14px;font-weight:500;">${done?'✓':'✗'} ${MAT_LABELS[m]}</span>`;
+  }).join('');
+
+  // Build simple timeline
+  const events = [];
+  if (app.createdAt) events.push({date: app.createdAt, text: '创建申请'});
+  if (app.deadline) events.push({date: app.deadline, text: '申请截止'});
+  if (app.interviewDate) events.push({date: app.interviewDate, text: '面试日期'});
+  events.sort((a,b) => a.date.localeCompare(b.date));
+
+  const timelineHTML = events.map(e => `<li><div class="tl-date">${e.date}</div><div class="tl-text">${e.text}</div></li>`).join('');
+
+  const statusColors = {
+    pending: {bg:'var(--warning-light)',color:'#9a6700'},
+    progress: {bg:'var(--info-light)',color:'#0077c7'},
+    interview: {bg:'var(--purple-light)',color:'var(--purple)'},
+    offer: {bg:'var(--success-light)',color:'#1a8f3a'},
+    rejected: {bg:'var(--danger-light)',color:'var(--danger)'}
+  };
+  const sc = statusColors[app.status] || {bg:'var(--primary-light)',color:'var(--primary)'};
+
+  document.getElementById('detailBody').innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:18px;">
+      <span class="tag tag-type" style="font-size:13px;padding:5px 12px;">${app.type}</span>
+      <span class="tag" style="font-size:13px;padding:5px 12px;background:${sc.bg};color:${sc.color};font-weight:500;">${info.label}</span>
+    </div>
+    ${app.deadline ? `<p style="font-size:13px;margin-bottom:10px;color:var(--text-secondary);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>截止日期：<strong style="color:var(--text)">${app.deadline}</strong></p>` : ''}
+    ${app.interviewDate ? `<p style="font-size:13px;margin-bottom:10px;color:var(--text-secondary);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>面试日期：<strong style="color:var(--text)">${app.interviewDate}</strong></p>` : ''}
+    <div style="margin-bottom:18px;">
+      <p style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">材料准备</p>
+      <div style="font-size:13px;">${matList}</div>
+    </div>
+    ${app.notes ? `<div style="margin-bottom:18px;"><p style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">备注</p><p style="font-size:13px;background:rgba(0,0,0,0.025);padding:12px 14px;border-radius:10px;color:var(--text);line-height:1.5;">${app.notes}</p></div>` : ''}
+    <div>
+      <p style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">时间线</p>
+      <ul class="timeline">${timelineHTML}</ul>
+    </div>
+    <p style="font-size:11px;color:var(--text-tertiary);margin-top:18px;">创建于 ${app.createdAt || '-'} · 更新于 ${app.updatedAt || '-'}</p>
+  `;
+
+  document.getElementById('detailEditBtn').onclick = () => editApplication(id);
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('active'); });
+});
+
+// ============ INIT ============
+renderBoard();
+renderQuicklinks();
+</script>
+</body>
+</html>
