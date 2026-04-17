@@ -180,6 +180,14 @@
     max-width: 320px;
   }
 
+  /* Filter row for mobile grouping (inline on desktop) */
+  .filter-row-mobile {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .filter-row-mobile select { flex: 1; min-width: 0; }
+
   /* Kanban Board */
   .kanban {
     display: flex;
@@ -663,14 +671,208 @@
     background: var(--primary-light);
   }
 
-  /* Responsive */
+  /* ============ Responsive: Mobile First ============ */
+
+  /* --- Small phones (< 400px) --- */
+  @media (max-width: 399px) {
+    .header { padding: 12px 14px; }
+    .header h1 { font-size: 16px; }
+    .header-actions { gap: 6px; }
+    .view-toggle button { padding: 5px 8px; font-size: 11px; }
+    .view-toggle button svg { width: 12px; height: 12px; }
+    .btn-add { padding: 6px 10px; font-size: 12px; }
+    .btn-add svg { width: 12px; height: 12px; }
+    .stats-bar { padding: 10px 12px; gap: 8px; grid-template-columns: repeat(3, 1fr); }
+    .stat-card { padding: 12px 14px; min-width: 110px; }
+    .stat-card .stat-num { font-size: 24px; }
+    .stat-card .stat-label { font-size: 10px; }
+    .stat-card .stat-icon { width: 30px; height: 30px; }
+    .filter-bar { padding: 10px 12px; gap: 8px; }
+    .quicklinks-section { padding: 10px 12px; }
+    .kanban { padding: 10px; gap: 10px; }
+    .table-view { padding: 10px; }
+    .modal { width: 96%; border-radius: 16px; }
+    .modal-header { padding: 18px 18px 0; }
+    .modal-body { padding: 18px; }
+    .modal-footer { padding: 0 18px 18px; }
+    /* Single column kanban cards on small phones */
+    .app-card { flex: 1 1 100%; }
+  }
+
+  /* --- Phones & small tablets (< 768px) --- */
   @media (max-width: 768px) {
-    .header { padding: 14px 18px; }
-    .header h1 { font-size: 18px; }
-    .stats-bar, .filter-bar, .quicklinks-section { padding: 12px 18px; }
-    .kanban { padding: 14px; gap: 12px; }
-    .kanban-column { min-width: 240px; }
-    .table-view { padding: 14px; }
+    /* Header */
+    .header {
+      padding: 14px 16px;
+      flex-wrap: nowrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .header-left { flex: 1; min-width: 0; }
+    .header h1 { font-size: 17px; }
+    .header-actions {
+      width: auto;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .view-toggle button { padding: 8px; gap: 0; }
+    .view-toggle button svg { width: 16px; height: 16px; }
+    .btn-add { padding: 8px; gap: 0; }
+    .btn-add svg { width: 16px; height: 16px; }
+    /* Hide button text on mobile */
+    .btn-label { display: none; }
+
+    /* Stats Bar — 3-column grid, horizontally scrollable */
+    .stats-bar {
+      padding: 12px 14px;
+      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .stat-card {
+      min-width: 0;
+      padding: 12px 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .stat-card .stat-num { font-size: 26px; }
+    .stat-card .stat-label { font-size: 10px; margin-top: 2px; }
+    .stat-card .stat-icon { width: 28px; height: 28px; align-self: flex-end; }
+    .stat-card .stat-icon svg { width: 16px; height: 16px; }
+    .stat-card:hover { transform: none; }
+
+    /* Filter Bar — stack vertically */
+    .filter-bar {
+      padding: 10px 14px;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .filter-bar label { font-size: 12px; }
+    .filter-bar select, .filter-bar input[type="text"] {
+      padding: 10px 12px;
+      font-size: 14px; /* prevent iOS zoom */
+    }
+    .search-input {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .filter-row-mobile {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-row-mobile select { flex: 1; min-width: 0; }
+
+    /* Quick Links — horizontal scroll, compact */
+    .quicklinks-section {
+      padding: 10px 14px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .quicklinks-section::-webkit-scrollbar { display: none; }
+    .quicklinks-label { flex-shrink: 0; font-size: 11px; white-space: nowrap; }
+    .quicklinks-body {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .quicklinks-body::-webkit-scrollbar { display: none; }
+    .qlink {
+      flex-shrink: 0;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .qlink .qlink-icon { width: 20px; height: 20px; font-size: 11px; }
+
+    /* Kanban — single column vertical scroll */
+    .kanban {
+      padding: 12px 14px;
+      flex-direction: column;
+      gap: 12px;
+      overflow-x: hidden;
+      min-height: auto;
+    }
+    .kanban-column {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .column-body {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .app-card {
+      flex: 1 1 calc(50% - 4px);
+      min-width: 0;
+      padding: 12px 14px;
+    }
+    .app-card .company { font-size: 14px; }
+    .app-card .position { font-size: 12px; }
+    .app-card .card-actions { opacity: 1; } /* always show on mobile */
+    .app-card:hover { transform: none; }
+
+    /* Table View — horizontal scroll, keep table layout */
+    .table-view {
+      padding: 12px 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .app-table {
+      min-width: 700px;
+    }
+    .app-table thead th,
+    .app-table tbody td {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    /* Modal — full width, more spacing */
+    .modal {
+      width: 94%;
+      max-width: 100%;
+      border-radius: 18px;
+      max-height: 92vh;
+    }
+    .modal-header { padding: 20px 20px 0; }
+    .modal-header h2 { font-size: 17px; }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      padding: 0 20px 20px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .modal-footer .btn { width: 100%; justify-content: center; padding: 12px; font-size: 14px; }
+    .form-row { flex-direction: column; gap: 0; }
+    .form-group input, .form-group select, .form-group textarea {
+      font-size: 16px; /* prevent iOS zoom */
+    }
+
+    /* Card tags smaller on mobile */
+    .tag { font-size: 10px; padding: 2px 7px; }
+    .status-badge { font-size: 11px; padding: 3px 8px; }
+    .priority-badge { font-size: 10px; padding: 2px 6px; }
+  }
+
+  /* --- Tablets (769px - 1024px) --- */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .stats-bar { gap: 10px; padding: 16px 24px; }
+    .stat-card { padding: 14px 16px; min-width: 120px; }
+    .stat-card .stat-num { font-size: 28px; }
+    .kanban { padding: 18px 20px; gap: 12px; }
+    .kanban-column { min-width: 220px; max-width: 300px; }
+    .filter-bar { padding: 12px 24px; }
+    .quicklinks-section { padding: 12px 24px; }
+    .table-view { padding: 18px 20px; }
   }
 </style>
 </head>
@@ -685,10 +887,10 @@
   </div>
   <div class="header-actions">
     <div class="view-toggle">
-      <button id="btnKanban" class="active" onclick="switchView('kanban')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> 看板</button>
-      <button id="btnTable" onclick="switchView('table')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><line x1="8" y1="3" x2="8" y2="21"/></svg> 表格</button>
+      <button id="btnKanban" class="active" onclick="switchView('kanban')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> <span class="btn-label">看板</span></button>
+      <button id="btnTable" onclick="switchView('table')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><line x1="8" y1="3" x2="8" y2="21"/></svg> <span class="btn-label">表格</span></button>
     </div>
-    <button class="btn btn-add" onclick="openAddModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新增申请</button>
+    <button class="btn btn-add" onclick="openAddModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span class="btn-label">新增申请</span></button>
   </div>
 </div>
 
@@ -705,18 +907,20 @@
 <div class="filter-bar">
   <label>筛选：</label>
   <input type="text" class="search-input" id="searchInput" placeholder="搜索公司名或职位..." oninput="renderBoard()">
-  <select id="filterType" onchange="renderBoard()">
-    <option value="">全部类型</option>
-    <option value="秋招">秋招</option>
-    <option value="春招">春招</option>
-    <option value="实习">实习</option>
-  </select>
-  <select id="filterSort" onchange="renderBoard()">
-    <option value="deadline">按截止日期排序</option>
-    <option value="update">按更新时间排序</option>
-    <option value="company">按公司名排序</option>
-    <option value="status">按阶段排序</option>
-  </select>
+  <div class="filter-row-mobile">
+    <select id="filterType" onchange="renderBoard()">
+      <option value="">全部类型</option>
+      <option value="秋招">秋招</option>
+      <option value="春招">春招</option>
+      <option value="实习">实习</option>
+    </select>
+    <select id="filterSort" onchange="renderBoard()">
+      <option value="deadline">按截止日期排序</option>
+      <option value="update">按更新时间排序</option>
+      <option value="company">按公司名排序</option>
+      <option value="status">按阶段排序</option>
+    </select>
+  </div>
 </div>
 
 <!-- Kanban Board -->
@@ -1072,13 +1276,13 @@ function renderTable() {
     const channel = app.channel || '-';
 
     html += `<tr onclick="showDetail('${app.id}')">
-      <td class="td-shaded"><span class="td-company">${app.company}</span><br><span class="td-position">${app.position}</span></td>
-      <td><span class="status-badge ${app.status}">${info.label}</span></td>
-      <td class="td-shaded" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${app.notes||''}">${app.notes || '-'}</td>
-      <td>${deadlineCell}</td>
-      <td><span class="priority-badge ${pri}">${priLabels[pri]}</span></td>
-      <td class="td-shaded">${channel}</td>
-      <td><div class="table-actions">
+      <td class="td-shaded" data-label=""><span class="td-company">${app.company}</span><br><span class="td-position">${app.position}</span></td>
+      <td data-label="阶段"><span class="status-badge ${app.status}">${info.label}</span></td>
+      <td class="td-shaded" data-label="备注" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${app.notes||''}">${app.notes || '-'}</td>
+      <td data-label="截止">${deadlineCell}</td>
+      <td data-label="优先级"><span class="priority-badge ${pri}">${priLabels[pri]}</span></td>
+      <td class="td-shaded" data-label="渠道">${channel}</td>
+      <td data-label=""><div class="table-actions">
         <button title="编辑" onclick="event.stopPropagation();editApplication('${app.id}')">✏</button>
         <button title="删除" class="btn-del" onclick="event.stopPropagation();deleteApplication('${app.id}')">✕</button>
       </div></td>
